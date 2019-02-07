@@ -2,7 +2,7 @@
 {
     public enum XOperand
     {
-        Fact,
+        Predicate,
         Not,
         And,
         Or
@@ -15,17 +15,36 @@
 
     public class XExpression : IXExpression
     {
-        public XFact Fact { get; private set; }
-        public XOperand Type => XOperand.Fact;
+        public XPredicate Predicate { get; private set; }
+        public XOperand Type => XOperand.Predicate;
 
-        public XExpression(XFact fact)
+        public XExpression(XPredicate predicate)
         {
-            Fact = fact;
+            Predicate = predicate;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is XExpression)
+            {
+                var exp = obj as XExpression;
+                return Predicate == exp.Predicate;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return Predicate.GetHashCode() + (int)Type;
+            }
         }
 
         public override string ToString()
         {
-            return Fact.ToString();
+            return Predicate.ToString();
         }
     }
 
@@ -37,6 +56,25 @@
         public XNot(IXExpression expression)
         {
             Expression = expression;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is XNot)
+            {
+                var exp = obj as XNot;
+                return Expression.Equals(exp.Expression);
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return Expression.GetHashCode() + (int)Type;
+            }
         }
 
         public override string ToString()
@@ -57,6 +95,25 @@
             Right = right;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is XAnd)
+            {
+                var exp = obj as XAnd;
+                return Left.Equals(exp.Left) && Right.Equals(exp.Right);
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return Left.GetHashCode() + Right.GetHashCode() + (int)Type;
+            }
+        }
+
         public override string ToString()
         {
             return "and(" + Left.ToString() + "," + Right.ToString() + ")";
@@ -73,6 +130,25 @@
         {
             Left = left;
             Right = right;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is XAnd)
+            {
+                var exp = obj as XAnd;
+                return Left.Equals(exp.Left) && Right.Equals(exp.Right);
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return Left.GetHashCode() + Right.GetHashCode() + (int)Type;
+            }
         }
 
         public override string ToString()

@@ -42,7 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logic\XExpression.cs" />
-    <Compile Include="Logic\XFact.cs" />
+    <Compile Include="Logic\XDatabase.cs" />
+    <Compile Include="Logic\XClause.cs" />
     <Compile Include="Logic\XPredicate.cs" />
     <Compile Include="Logic\XSignature.cs" />
     <Compile Include="Logic\XType.cs" />

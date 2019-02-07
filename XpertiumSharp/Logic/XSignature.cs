@@ -1,65 +1,48 @@
-﻿using System;
-using System.Linq;
-
-namespace XpertiumSharp.Logic
+﻿namespace XpertiumSharp.Logic
 {
     public class XSignature
     {
-        public string Name { get; protected set; }
-        public XVar[] Vars { get; protected set; }
+        public readonly string Name;
+        public readonly int Arity;
 
-        public XSignature(string name, params XVar[] vars)
+        public XSignature(string name, int arity)
         {
             Name = name;
-            Vars = new XVar[vars.Length];
-            Array.Copy(vars, Vars, vars.Length);
-        }
-
-        public XVar GetVar(int index)
-        {
-            return Vars[index];
+            Arity = arity;
         }
 
         public override bool Equals(object obj)
         {
             if (obj is XSignature)
             {
-                var signature = obj as XSignature;
-                return Name.Equals(signature.Name) && Enumerable.SequenceEqual(Vars, signature.Vars);
+                var sign = obj as XSignature;
+                return Arity == sign.Arity && Name == sign.Name;
             }
 
             return false;
-        }
-
-        public static bool operator ==(XSignature lhs, XSignature rhs)
-        {
-            return lhs.Name.Equals(rhs.Name) && Enumerable.SequenceEqual(lhs.Vars, rhs.Vars);
-        }
-
-        public static bool operator !=(XSignature lhs, XSignature rhs)
-        {
-            return !lhs.Name.Equals(rhs.Name) || !Enumerable.SequenceEqual(lhs.Vars, rhs.Vars);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                int hash = 17;
-
-                // get hash code for all items in array
-                foreach (var item in Vars)
-                {
-                    hash = hash * 23 + ((item != null) ? item.GetHashCode() : 0);
-                }
-
-                return hash;
+                return Name.GetHashCode() + Arity;
             }
+        }
+
+        public static bool operator ==(XSignature lhs, XSignature rhs)
+        {
+            return lhs.Arity == rhs.Arity && lhs.Name == rhs.Name;
+        }
+
+        public static bool operator !=(XSignature lhs, XSignature rhs)
+        {
+            return lhs.Arity != rhs.Arity || lhs.Name != rhs.Name;
         }
 
         public override string ToString()
         {
-            return "(" + string.Join(",", Vars) + ")";
+            return Name + "(" + Arity + ")";
         }
     }
 }
