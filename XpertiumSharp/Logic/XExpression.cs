@@ -4,8 +4,7 @@
     {
         Predicate,
         Not,
-        And,
-        Or
+        And
     }
 
     public interface IXExpression
@@ -117,43 +116,6 @@
         public override string ToString()
         {
             return "and(" + Left.ToString() + "," + Right.ToString() + ")";
-        }
-    }
-
-    public class XOr : IXExpression
-    {
-        public IXExpression Left { get; private set; }
-        public IXExpression Right { get; private set; }
-        public XOperand Type => XOperand.Or;
-
-        public XOr(IXExpression left, IXExpression right)
-        {
-            Left = left;
-            Right = right;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is XAnd)
-            {
-                var exp = obj as XAnd;
-                return Left.Equals(exp.Left) && Right.Equals(exp.Right);
-            }
-
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return Left.GetHashCode() + Right.GetHashCode() + (int)Type;
-            }
-        }
-
-        public override string ToString()
-        {
-            return "or(" + Left.ToString() + "," + Right.ToString() + ")";
         }
     }
 }

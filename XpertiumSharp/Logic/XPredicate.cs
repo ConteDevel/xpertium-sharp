@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace XpertiumSharp.Logic
 {
+    [Serializable]
     public class XPredicate
     {
         public XSignature Signature { get; protected set; }

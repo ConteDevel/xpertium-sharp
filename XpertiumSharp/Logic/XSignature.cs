@@ -1,5 +1,8 @@
-﻿namespace XpertiumSharp.Logic
+﻿using System;
+
+namespace XpertiumSharp.Logic
 {
+    [Serializable]
     public class XSignature
     {
         public readonly string Name;

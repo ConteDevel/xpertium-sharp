@@ -1,5 +1,8 @@
-﻿namespace XpertiumSharp.Logic
+﻿using System;
+
+namespace XpertiumSharp.Logic
 {
+    [Serializable]
     public struct XVar
     {
         public XType Type { get; private set; }
