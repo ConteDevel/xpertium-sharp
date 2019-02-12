@@ -1,4 +1,7 @@
-﻿namespace XpertiumSharp.Logic
+﻿using System;
+using System.Linq;
+
+namespace XpertiumSharp.Logic
 {
     public enum XOperand
     {
@@ -6,12 +9,14 @@
         Not,
         And
     }
-
+    
     public interface IXExpression
     {
         XOperand Type { get; }
+        void Bind(XVar oldV, XVar newV);
     }
 
+    [Serializable]
     public class XExpression : IXExpression
     {
         public XPredicate Predicate { get; private set; }
@@ -45,8 +50,20 @@
         {
             return Predicate.ToString();
         }
+
+        public void Bind(XVar oldV, XVar newV)
+        {
+            for (int i = 0; i < Predicate.Signature.Arity; ++i)
+            {
+                if (Predicate.Vars[i] == oldV)
+                {
+                    Predicate.Vars[i] = new XVar(newV.Type, newV.Value);
+                }
+            }
+        }
     }
 
+    [Serializable]
     public class XNot : IXExpression
     {
         public IXExpression Expression { get; private set; }
@@ -80,18 +97,22 @@
         {
             return "not(" + Expression.ToString() + ")";
         }
+
+        public void Bind(XVar oldV, XVar newV)
+        {
+            Expression.Bind(oldV, newV);
+        }
     }
 
+    [Serializable]
     public class XAnd : IXExpression
     {
-        public IXExpression Left { get; private set; }
-        public IXExpression Right { get; private set; }
+        public IXExpression[] Childs { get; private set; }
         public XOperand Type => XOperand.And;
 
-        public XAnd(IXExpression left, IXExpression right)
+        public XAnd(params IXExpression[] childs)
         {
-            Left = left;
-            Right = right;
+            Childs = childs;
         }
 
         public override bool Equals(object obj)
@@ -99,7 +120,7 @@
             if (obj is XAnd)
             {
                 var exp = obj as XAnd;
-                return Left.Equals(exp.Left) && Right.Equals(exp.Right);
+                return Enumerable.SequenceEqual(Childs, exp.Childs);
             }
 
             return false;
@@ -109,13 +130,29 @@
         {
             unchecked
             {
-                return Left.GetHashCode() + Right.GetHashCode() + (int)Type;
+                int hash = 17;
+
+                // get hash code for all items in array
+                foreach (var item in Childs)
+                {
+                    hash = hash * 23 + ((item != null) ? item.GetHashCode() : 0);
+                }
+
+                return hash + (int)Type;
             }
         }
 
         public override string ToString()
         {
-            return "and(" + Left.ToString() + "," + Right.ToString() + ")";
+            return "and(" + string.Join<IXExpression>(",", Childs) + ")";
+        }
+
+        public void Bind(XVar oldV, XVar newV)
+        {
+            foreach (var child in Childs)
+            {
+                child.Bind(oldV, newV);
+            }
         }
     }
 }
