@@ -116,7 +116,7 @@
             // clearOutputToolStripMenuItem
             // 
             this.clearOutputToolStripMenuItem.Name = "clearOutputToolStripMenuItem";
-            this.clearOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clearOutputToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.clearOutputToolStripMenuItem.Text = "Clear output";
             this.clearOutputToolStripMenuItem.Click += new System.EventHandler(this.ClearOutputToolStripMenuItem_Click);
             // 
@@ -240,6 +240,7 @@
             this.tableLayoutPanel1.SetRowSpan(this.listing, 2);
             this.listing.Size = new System.Drawing.Size(381, 364);
             this.listing.TabIndex = 3;
+            this.listing.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.Listing_PreviewKeyDown);
             // 
             // log
             // 

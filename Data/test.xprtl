@@ -1,0 +1,4 @@
+predicates:
+	test(3)
+clauses:
+	test(A, '5', B).

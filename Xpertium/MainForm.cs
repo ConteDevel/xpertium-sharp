@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using XpertiumSharp.Logic;
 
@@ -27,7 +29,8 @@ namespace Xpertium
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-
+                listing.Clear();
+                listing.Text = File.ReadAllText(openFileDialog.FileName);
             }
         }
 
@@ -35,13 +38,28 @@ namespace Xpertium
         {
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
+                var stream = saveFileDialog.OpenFile();
 
+                if (stream != null)
+                {
+                    byte[] byteArray = Encoding.UTF8.GetBytes(listing.Text);
+                    stream.Write(byteArray, 0, byteArray.Length);
+                    stream.Close();
+                }
             }
         }
 
         private void ClearOutputToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
             log.Clear();
+        }
+
+        private void Listing_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Tab)
+            {
+                e.IsInputKey = true;
+            }
         }
     }
 }
