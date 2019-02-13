@@ -3,7 +3,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace XpertiumSharp.Core
 {
-    public static class SystemExtension
+    public static class XSystemExtension
     {
         public static T Clone<T>(this T source)
         {

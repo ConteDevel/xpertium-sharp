@@ -5,24 +5,24 @@ using XpertiumSharp.Core.Exceptions;
 
 namespace XpertiumSharp.Core
 {
-    public class Token<TTokenType> where TTokenType : Enum
+    public class XToken<TTokenType> where TTokenType : Enum
     {
         public readonly TTokenType Type;
         public readonly string Value;
 
-        public Token(TTokenType type, string value)
+        public XToken(TTokenType type, string value)
         {
             Type = type;
             Value = value;
         }
 
-        public Token(TTokenType type) : this(type, null)
+        public XToken(TTokenType type) : this(type, null)
         {
 
         }
     }
 
-    public class TokenMatch<TTokenType> where TTokenType : Enum
+    public class XTokenMatch<TTokenType> where TTokenType : Enum
     {
         public bool IsMatch { get; set; }
         public TTokenType TokenType { get; set; }
@@ -30,23 +30,23 @@ namespace XpertiumSharp.Core
         public string RemainingText { get; set; }
     }
 
-    public class TokenDefinition<TTokenType> where TTokenType : Enum
+    public class XTokenDefinition<TTokenType> where TTokenType : Enum
     {
         private readonly TTokenType type;
         private readonly Regex regex;
 
-        public TokenDefinition(TTokenType type, Regex regex)
+        public XTokenDefinition(TTokenType type, Regex regex)
         {
             this.type = type;
             this.regex = regex;
         }
 
-        public TokenDefinition(TTokenType type, string regexPattern) : this(type, new Regex(regexPattern, RegexOptions.IgnoreCase))
+        public XTokenDefinition(TTokenType type, string regexPattern) : this(type, new Regex(regexPattern, RegexOptions.IgnoreCase))
         {
 
         }
 
-        public TokenMatch<TTokenType> Match(string input)
+        public XTokenMatch<TTokenType> Match(string input)
         {
             var match = regex.Match(input);
 
@@ -59,7 +59,7 @@ namespace XpertiumSharp.Core
                     remainingText = input.Substring(match.Length);
                 }
 
-                return new TokenMatch<TTokenType>()
+                return new XTokenMatch<TTokenType>()
                 {
                     IsMatch = true,
                     RemainingText = remainingText,
@@ -69,31 +69,31 @@ namespace XpertiumSharp.Core
             }
             else
             {
-                return new TokenMatch<TTokenType>() { IsMatch = false };
+                return new XTokenMatch<TTokenType>() { IsMatch = false };
             }
         }
     }
 
-    public class Tokenizer<TTokenType> where TTokenType : Enum
+    public class XTokenizer<TTokenType> where TTokenType : Enum
     {
-        private readonly List<TokenDefinition<TTokenType>> definitions;
+        private readonly List<XTokenDefinition<TTokenType>> definitions;
 
-        public Tokenizer(List<TokenDefinition<TTokenType>> definitions)
+        public XTokenizer(List<XTokenDefinition<TTokenType>> definitions)
         {
             this.definitions = definitions;
         }
 
-        public Tokenizer() : this(new List<TokenDefinition<TTokenType>>())
+        public XTokenizer() : this(new List<XTokenDefinition<TTokenType>>())
         {
 
         }
 
-        public void AddDefinition(TokenDefinition<TTokenType> definition)
+        public void AddDefinition(XTokenDefinition<TTokenType> definition)
         {
             definitions.Add(definition);
         }
 
-        public bool RemoveDefinition(TokenDefinition<TTokenType> definition)
+        public bool RemoveDefinition(XTokenDefinition<TTokenType> definition)
         {
             return definitions.Remove(definition);
         }
@@ -103,7 +103,7 @@ namespace XpertiumSharp.Core
             definitions.RemoveAt(index);
         }
 
-        private TokenMatch<TTokenType> FindMatch(string input)
+        private XTokenMatch<TTokenType> FindMatch(string input)
         {
             foreach (var definition in definitions)
             {
@@ -115,7 +115,7 @@ namespace XpertiumSharp.Core
                 }
             }
 
-            return new TokenMatch<TTokenType>() { IsMatch = false };
+            return new XTokenMatch<TTokenType>() { IsMatch = false };
         }
 
         private bool IsWhitespace(string lqlText)
@@ -128,10 +128,10 @@ namespace XpertiumSharp.Core
         /// </summary>
         /// <param name="input">Input string containing tokens</param>
         /// <returns>Tokens</returns>
-        /// <exception cref="InvalidTokenException">Throws when the next token wasn't recognized</exception>
-        public List<Token<TTokenType>> Tokenize(string input)
+        /// <exception cref="XInvalidTokenException">Throws when the next token wasn't recognized</exception>
+        public List<XToken<TTokenType>> Tokenize(string input)
         {
-            var tokens = new List<Token<TTokenType>>();
+            var tokens = new List<XToken<TTokenType>>();
             string remainingText = input;
 
             while (!string.IsNullOrWhiteSpace(remainingText))
@@ -140,13 +140,13 @@ namespace XpertiumSharp.Core
 
                 if (match.IsMatch)
                 {
-                    tokens.Add(new Token<TTokenType>(match.TokenType, match.Value));
+                    tokens.Add(new XToken<TTokenType>(match.TokenType, match.Value));
                     remainingText = match.RemainingText;
                 }
                 else
                 {
                     int index = input.Length - match.RemainingText.Length;
-                    throw new InvalidTokenException(string.Format("Invalid token was found at {0}", index));
+                    throw new XInvalidTokenException(string.Format("Invalid token was found at {0}", index));
                 }
             }
 
