@@ -117,11 +117,6 @@ namespace XpertiumSharp.Core
 
             return new XTokenMatch<TTokenType>() { IsMatch = false };
         }
-
-        private bool IsWhitespace(string lqlText)
-        {
-            return Regex.IsMatch(lqlText, "^\\s+");
-        }
         
         /// <summary>
         /// Tokenizes input string
@@ -145,7 +140,7 @@ namespace XpertiumSharp.Core
                 }
                 else
                 {
-                    int index = input.Length - match.RemainingText.Length;
+                    int index = input.Length - remainingText.Length;
                     throw new XInvalidTokenException(string.Format("Invalid token was found at {0}", index));
                 }
             }

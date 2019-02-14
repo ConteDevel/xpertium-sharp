@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using XpertiumSharp.Logic;
+using XpertiumSharp.Utils;
 
 namespace Xpertium
 {
     public partial class MainForm : Form
     {
+        private XLogicalModelParser parser;
+
         public MainForm()
         {
             InitializeComponent();
@@ -20,9 +24,31 @@ namespace Xpertium
 
         private void RunButton_Click(object sender, System.EventArgs e)
         {
-            var interpreter = new XInterpreter(new XDatabase());
-            var target = new XPredicate(new XSignature("test", 2), new XVar(XType.Const, "2"), new XVar(XType.Var, "X"));
-            interpreter.Run(target, out List<XPredicate> solutions);
+            log.Clear();
+            log.AppendText("Building...\n");
+
+            try
+            {
+                var db = parser.Parse(listing.Text);
+                var target = parser.ParseTarget(this.target.Text, db);
+                log.AppendText("Success\n");
+
+                log.AppendText("Executing...\n");
+                var interpreter = new XInterpreter(db);
+
+                if (interpreter.Run(target, out List<XPredicate> solutions))
+                {
+                    log.AppendText("TRUE");
+                }
+                else
+                {
+                    log.AppendText("FALSE");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.AppendText("Error: " + ex.Message);
+            }
         }
 
         private void OpenFile_Click(object sender, System.EventArgs e)
@@ -60,6 +86,11 @@ namespace Xpertium
             {
                 e.IsInputKey = true;
             }
+        }
+
+        private void MainForm_Load(object sender, System.EventArgs e)
+        {
+            parser = new XLogicalModelParser();
         }
     }
 }

@@ -1,4 +1,8 @@
 predicates:
-	test(3)
+	f(2)
 clauses:
-	test(A, '5', B).
+	f(X, Y) :- f(X, Z), f(Z, Y).
+	f(X, Y) :- f(Y, X).
+	f('1', '2').
+	f('2', '3').
+	f('6', '3').

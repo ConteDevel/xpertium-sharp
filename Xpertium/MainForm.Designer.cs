@@ -271,6 +271,7 @@
             this.MinimumSize = new System.Drawing.Size(480, 320);
             this.Name = "MainForm";
             this.Text = "Xpertium Test";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.splitContainer.Panel1.ResumeLayout(false);

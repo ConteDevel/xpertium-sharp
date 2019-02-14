@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using XpertiumSharp.Core;
 
 namespace XpertiumSharp.Logic
@@ -71,17 +72,42 @@ namespace XpertiumSharp.Logic
 
         public static bool operator ==(XClause lhs, XClause rhs)
         {
+            if (lhs is null || rhs is null)
+            {
+                return lhs is null && rhs is null;
+            }
+
             return lhs.Predicate == rhs.Predicate && lhs.Body.Equals(rhs.Body);
         }
 
         public static bool operator !=(XClause lhs, XClause rhs)
         {
+            if (lhs is null && rhs is null)
+            {
+                return false;
+            }
+
+            if (lhs is null || rhs is null)
+            {
+                return true;
+            }
+
             return lhs.Predicate != rhs.Predicate || !lhs.Body.Equals(rhs.Body);
         }
 
         public override string ToString()
         {
-            return Predicate.ToString() + ":-" + Body.ToString();
+            var sb = new StringBuilder(Predicate.ToString());
+
+            if (Body != null)
+            {
+                sb.Append(":-");
+                sb.Append(Body.ToString());
+            }
+
+            sb.Append('.');
+
+            return sb.ToString();
         }
     }
 }

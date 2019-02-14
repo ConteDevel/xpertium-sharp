@@ -35,11 +35,26 @@ namespace XpertiumSharp.Logic
 
         public static bool operator ==(XPredicate lhs, XPredicate rhs)
         {
+            if (lhs is null || rhs is null)
+            {
+                return lhs is null && rhs is null;
+            }
+
             return lhs.Signature == rhs.Signature && Enumerable.SequenceEqual(lhs.Vars, rhs.Vars);
         }
 
         public static bool operator !=(XPredicate lhs, XPredicate rhs)
         {
+            if (lhs is null && rhs is null)
+            {
+                return false;
+            }
+
+            if (lhs is null || rhs is null)
+            {
+                return true;
+            }
+
             return lhs.Signature != rhs.Signature || !Enumerable.SequenceEqual(lhs.Vars, rhs.Vars);
         }
 

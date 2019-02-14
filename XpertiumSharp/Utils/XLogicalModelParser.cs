@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using XpertiumSharp.Core;
 using XpertiumSharp.Logic;
 
@@ -15,15 +16,15 @@ namespace XpertiumSharp.Utils
             {
                 new XTokenDefinition<XTokenType>(XTokenType.PredicateBlock, "^predicates:"),
                 new XTokenDefinition<XTokenType>(XTokenType.ClauseBlock, "^clauses:"),
-                new XTokenDefinition<XTokenType>(XTokenType.Value, "^\\\"(.*?)\\\""),
-                new XTokenDefinition<XTokenType>(XTokenType.LBrace, "^("),
-                new XTokenDefinition<XTokenType>(XTokenType.RBrace, "^)"),
+                new XTokenDefinition<XTokenType>(XTokenType.Value, "^\\\'(.*?)\\\'"),
+                new XTokenDefinition<XTokenType>(XTokenType.LBrace, "^\\("),
+                new XTokenDefinition<XTokenType>(XTokenType.RBrace, "^\\)"),
                 new XTokenDefinition<XTokenType>(XTokenType.Name, "^[a-zA-Z]+"),
                 new XTokenDefinition<XTokenType>(XTokenType.Arity, "^[0-9]+"),
                 new XTokenDefinition<XTokenType>(XTokenType.Not, "^!"),
                 new XTokenDefinition<XTokenType>(XTokenType.Separator, "^,"),
                 new XTokenDefinition<XTokenType>(XTokenType.Dot, "^\\."),
-                new XTokenDefinition<XTokenType>(XTokenType.Assignment, "^-=")
+                new XTokenDefinition<XTokenType>(XTokenType.Assignment, "^\\:-")
             };
             tokenizer = new XTokenizer<XTokenType>(definitions);
         }
@@ -272,8 +273,24 @@ namespace XpertiumSharp.Utils
             }
         }
 
+        public XPredicate ParseTarget(string input, XDatabase db)
+        {
+            input = Regex.Replace(input, @"\s+", string.Empty);
+
+            if (string.IsNullOrEmpty(input))
+            {
+                throw new ArgumentException("No target");
+            }
+
+            var tokens = tokenizer.Tokenize(input);
+            ParsePredicate(tokens, 0, tokens.Count, db, out XPredicate predicate);
+
+            return predicate;
+        }
+
         public XDatabase Parse(string input)
         {
+            input = Regex.Replace(input, @"\s+", string.Empty);
             var tokens = tokenizer.Tokenize(input);
             var db = new XDatabase();
             ParseBody(tokens, db);

@@ -35,11 +35,26 @@ namespace XpertiumSharp.Logic
 
         public static bool operator ==(XSignature lhs, XSignature rhs)
         {
+            if (lhs is null || rhs is null)
+            {
+                return lhs is null && rhs is null;
+            }
+
             return lhs.Arity == rhs.Arity && lhs.Name == rhs.Name;
         }
 
         public static bool operator !=(XSignature lhs, XSignature rhs)
         {
+            if (lhs is null && rhs is null)
+            {
+                return false;
+            }
+
+            if (lhs is null || rhs is null)
+            {
+                return true;
+            }
+
             return lhs.Arity != rhs.Arity || lhs.Name != rhs.Name;
         }
 
