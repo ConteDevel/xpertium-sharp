@@ -17,7 +17,7 @@ namespace Xpertium
             InitializeComponent();
         }
 
-        private void ExitToolStripMenuItem_Click(object sender, System.EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
         }

@@ -22,6 +22,20 @@ namespace XpertiumSharp.Logic
             return Vars[index];
         }
 
+        public void Bind(XVar oldV, XVar newV)
+        {
+            if (oldV.Type == XType.Var)
+            {
+                for (int i = 0; i < Vars.Length; ++i)
+                {
+                    if (Vars[i] == oldV)
+                    {
+                        Vars[i] = newV;
+                    }
+                }
+            }
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is XPredicate)

@@ -30,28 +30,33 @@ namespace XpertiumSharp.Logic
             for (int i = 0; i < predicate.Signature.Arity; ++i)
             {
                 var sArg = predicate.Vars[i];
-                var oArg = copy.Predicate.Vars[i];
+                var dArg = copy.Predicate.Vars[i];
 
-                if (sArg.Type == XType.Const && oArg.Type == XType.Const && sArg.Value != oArg.Value)
+                if (sArg.Type == XType.Const && dArg.Type == XType.Const && sArg.Value != dArg.Value)
                 {
                     return null;
                 }
 
-                if (sArg != oArg && oArg.Type != XType.Const)
+                if (sArg != dArg)
                 {
-                    for (int j = 0; j < copy.Predicate.Signature.Arity; ++j)
+                    if (dArg.Type != XType.Const)
                     {
-                        var tmpArg = copy.Predicate.Vars[j];
-
-                        if (tmpArg == oArg)
+                        for (int j = 0; j < copy.Predicate.Signature.Arity; ++j)
                         {
-                            copy.Predicate.Vars[j] = sArg;
-
-                            if (copy.Body != null)
+                            if (copy.Predicate.Vars[j] == dArg)
                             {
-                                copy.Body.Bind(tmpArg, sArg);
+                                copy.Predicate.Vars[j] = sArg;
+
+                                if (copy.Body != null)
+                                {
+                                    copy.Body.Bind(dArg, sArg);
+                                }
                             }
                         }
+                    }
+                    else if (sArg.Type != XType.Const)
+                    {
+                        predicate.Bind(sArg, dArg);
                     }
                 }
             }

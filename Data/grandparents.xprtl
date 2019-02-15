@@ -1,0 +1,13 @@
+predicates:
+	p(2)
+	grandp(2)
+clauses:
+	p('Sergey', 'Artem').
+	p('Sergey', 'Denis').
+	p('Galina', 'Artem').
+	p('Galina', 'Denis').
+	p('Vera', 'Sergey').
+	p('Nikolay', 'Sergey').
+	p('Zul`fia', 'Galina').
+	p('Nikolay', 'Galina').
+	grandp(X, Y) :- p(X, Z), p(Z, Y).

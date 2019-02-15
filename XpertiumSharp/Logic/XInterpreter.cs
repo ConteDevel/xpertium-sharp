@@ -47,48 +47,60 @@ namespace XpertiumSharp.Logic
             }
         }
 
-        public bool Resolve(List<XPredicate> solutions, XAnd expression, out List<XPredicate> facts)
+        public bool Resolve2(XPredicate target, XAnd expression, out List<XPredicate> facts, out List<XPredicate> localFacts)
         {
             if (expression.Childs.Count > 0)
             {
-                var target = expression.Childs[0];
+                var exp = expression.Childs[0];
+                facts = new List<XPredicate>();
 
-                if (!Resolve(solutions, target, out facts))
+                if (!Resolve(target, exp, out List<XPredicate> partialSolutions, out localFacts))
                 {
                     return false;
                 }
 
-                if (target.Type == XOperand.Predicate)
+                if (exp.Type == XOperand.Predicate)
                 {
-                    var src = target as XExpression;
+                    var src = exp as XExpression;
                     expression.Childs.RemoveAt(0);
 
-                    for (int i = 0; i < facts.Count;)
-                    {
-                        var dest = facts[i];
-                        var exp = expression.Clone();
-                        Unify(src.Predicate, dest, exp);
+                    bool hasSolutions = false;
 
-                        if (Resolve(solutions, exp, out _))
+                    for (int i = 0; i < localFacts.Count; ++i)
+                    {
+                        var dest = localFacts[i];
+                        var expCopy = expression.Clone();
+                        Unify(src.Predicate, dest, expCopy);
+
+                        ++logger.Indent;
+
+                        if (Resolve2(partialSolutions[i], expCopy, out List<XPredicate> partialSolutions2, out _))
                         {
-                            return true;
+                            facts.AddRange(partialSolutions2);
+                            hasSolutions = true;
                         }
+
+                        --logger.Indent;
                     }
+
+                    return hasSolutions;
                 }
 
-                facts = new List<XPredicate>();
                 return false;
             }
-
-            facts = new List<XPredicate>();
+            
+            facts = new List<XPredicate>() { target };
+            localFacts = new List<XPredicate>();
             return true;
         }
 
-        public bool Resolve(List<XPredicate> solutions, IXExpression expression, out List<XPredicate> facts)
+        public bool Resolve(XPredicate target, IXExpression expression, out List<XPredicate> facts, out List<XPredicate> localFacts)
         {
             if (expression == null)
             {
                 facts = new List<XPredicate>();
+                localFacts = new List<XPredicate>();
+
                 return true;
             }
 
@@ -96,14 +108,39 @@ namespace XpertiumSharp.Logic
             {
                 case XOperand.Predicate:
                     var predicateExp = expression as XExpression;
-                    return Run(predicateExp.Predicate, out facts);
+                    facts = new List<XPredicate>();
+
+                    if (Run(predicateExp.Predicate, out localFacts))
+                    {
+
+                        foreach (var f in localFacts)
+                        {
+                            var clone = target.Clone();
+
+                            for (int i = 0; i < f.Vars.Length; ++i)
+                            {
+                                var sArg = predicateExp.Predicate.Vars[i];
+                                var dArg = f.Vars[i];
+
+                                if (sArg.Type == XType.Var && dArg.Type == XType.Const)
+                                {
+                                    clone.Bind(sArg, dArg);
+                                }
+                            }
+
+                            facts.Add(clone);
+                        }
+
+                        return true;
+                    }
+
+                    return false;
                 case XOperand.Not:
                     var notExp = expression as XNot;
-                    var localSolutions = new List<XPredicate>();
-                    return !Resolve(localSolutions, notExp.Expression.Clone(), out facts);
+                    return !Resolve(target, notExp.Expression.Clone(), out facts, out localFacts);
                 default:
                     var andExp = expression as XAnd;
-                    return Resolve(solutions, andExp, out facts);
+                    return Resolve2(target, andExp, out facts, out localFacts);
             }
         }
 
@@ -114,26 +151,44 @@ namespace XpertiumSharp.Logic
 
             if (!VerifySignature(target.Signature))
             {
+                logger.LogD("FAILED");
                 return false;
             }
 
             foreach (var c in Database.Clauses)
             {
-                var clause = c.Bind(target);
+                var clause = c.Bind(target.Clone());
 
                 if (clause != null)
                 {
                     logger.LogD("Suitable clause: {0}", clause);
                     ++logger.Indent;
-                    if (Resolve(solutions, clause.Body, out _) /*&& clause.Body == null*/ && !solutions.Contains(clause.Predicate))
+                    var newTarget = clause.Predicate;
+
+                    if (Resolve(newTarget, clause.Body, out List<XPredicate> partialSolutions, out _))
                     {
-                        solutions.Add(clause.Predicate);
+                        if (clause.Body == null && !solutions.Contains(newTarget))
+                        {
+                            solutions.Add(newTarget);
+                        }
+                        else
+                        {
+                            solutions.AddRange(partialSolutions);
+                        }
                     }
+
                     --logger.Indent;
                 }
             }
+            
+            if (solutions.Count != 0)
+            {
+                logger.LogD("SUCCESS");
+                return true;
+            }
 
-            return solutions.Count != 0;
+            logger.LogD("FAILED");
+            return false;
         }
     }
 }
