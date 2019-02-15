@@ -45,7 +45,7 @@ namespace XpertiumSharp.Logic
 
         public override string ToString()
         {
-            return (Type == XType.Const ? "c(" : "v(") + Value + ")";
+            return Value;
         }
     }
 }

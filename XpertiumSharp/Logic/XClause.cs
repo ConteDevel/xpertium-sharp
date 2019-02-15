@@ -39,11 +39,19 @@ namespace XpertiumSharp.Logic
 
                 if (sArg != oArg && oArg.Type != XType.Const)
                 {
-                    copy.Predicate.Vars[i] = new XVar(sArg.Type, sArg.Value);
-
-                    if (copy.Body != null)
+                    for (int j = 0; j < copy.Predicate.Signature.Arity; ++j)
                     {
-                        copy.Body.Bind(oArg, sArg);
+                        var tmpArg = copy.Predicate.Vars[j];
+
+                        if (tmpArg == oArg)
+                        {
+                            copy.Predicate.Vars[j] = sArg;
+
+                            if (copy.Body != null)
+                            {
+                                copy.Body.Bind(tmpArg, sArg);
+                            }
+                        }
                     }
                 }
             }
@@ -101,7 +109,7 @@ namespace XpertiumSharp.Logic
 
             if (Body != null)
             {
-                sb.Append(":-");
+                sb.Append(" :- ");
                 sb.Append(Body.ToString());
             }
 

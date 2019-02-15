@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace XpertiumSharp.Logic
@@ -53,11 +54,14 @@ namespace XpertiumSharp.Logic
 
         public void Bind(XVar oldV, XVar newV)
         {
-            for (int i = 0; i < Predicate.Signature.Arity; ++i)
+            if (oldV.Type == XType.Var)
             {
-                if (Predicate.Vars[i] == oldV)
+                for (int i = 0; i < Predicate.Signature.Arity; ++i)
                 {
-                    Predicate.Vars[i] = new XVar(newV.Type, newV.Value);
+                    if (Predicate.Vars[i] == oldV)
+                    {
+                        Predicate.Vars[i] = newV;
+                    }
                 }
             }
         }
@@ -107,12 +111,12 @@ namespace XpertiumSharp.Logic
     [Serializable]
     public class XAnd : IXExpression
     {
-        public IXExpression[] Childs { get; private set; }
+        public List<IXExpression> Childs { get; private set; }
         public XOperand Type => XOperand.And;
 
         public XAnd(params IXExpression[] childs)
         {
-            Childs = childs;
+            Childs = new List<IXExpression>(childs);
         }
 
         public override bool Equals(object obj)

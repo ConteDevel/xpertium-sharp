@@ -22,10 +22,11 @@ namespace Xpertium
             Close();
         }
 
-        private void RunButton_Click(object sender, System.EventArgs e)
+        private void RunButton_Click(object sender, EventArgs e)
         {
             log.Clear();
             log.AppendText("Building...\n");
+            var logger = new Logger(log);
 
             try
             {
@@ -34,11 +35,16 @@ namespace Xpertium
                 log.AppendText("Success\n");
 
                 log.AppendText("Executing...\n");
-                var interpreter = new XInterpreter(db);
+                var interpreter = new XInterpreter(db, logger);
 
                 if (interpreter.Run(target, out List<XPredicate> solutions))
                 {
-                    log.AppendText("TRUE");
+                    log.AppendText("TRUE\nSolutions:\n");
+
+                    foreach (var solution in solutions)
+                    {
+                        log.AppendText(solution.ToString() + "\n");
+                    }
                 }
                 else
                 {

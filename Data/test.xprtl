@@ -1,8 +1,10 @@
 predicates:
+	fun(2)
 	f(2)
 clauses:
-	f(X, Y) :- f(X, Z), f(Z, Y).
-	f(X, Y) :- f(Y, X).
+	fun(X, Y) :- f(X, Z), f(Z, Y).
+	fun(X, Y) :- f(Y, X).
 	f('1', '2').
+	f('2', '0').
 	f('2', '3').
 	f('6', '3').

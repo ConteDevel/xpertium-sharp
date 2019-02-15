@@ -1,0 +1,4 @@
+predicates:
+	num(3)
+clauses:
+	num('0', X, X).
