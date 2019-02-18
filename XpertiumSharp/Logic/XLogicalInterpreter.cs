@@ -3,13 +3,13 @@ using XpertiumSharp.Core;
 
 namespace XpertiumSharp.Logic
 {
-    public class XInterpreter
+    public class XLogicalInterpreter
     {
         private readonly IXLogger logger;
 
         public XDatabase Database { get; private set; }
 
-        public XInterpreter(XDatabase db, IXLogger logger = null)
+        public XLogicalInterpreter(XDatabase db, IXLogger logger = null)
         {
             Database = db;
             this.logger = (logger == null) ? new XLogger() : logger;

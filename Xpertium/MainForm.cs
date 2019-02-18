@@ -35,7 +35,7 @@ namespace Xpertium
                 log.AppendText("Success\n");
 
                 log.AppendText("Executing...\n");
-                var interpreter = new XInterpreter(db, logger);
+                var interpreter = new XLogicalInterpreter(db, logger);
 
                 if (interpreter.Run(target, out List<XPredicate> solutions))
                 {
